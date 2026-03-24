@@ -1,0 +1,18 @@
+NPT production run (300K, 1atm), no restraints (Monte Carlo barostat)
+&cntrl
+  imin=0, irest=0, ntx=1,
+  nstlim=60000000,       ! 100 ns (50000000 * 0.002 ps/step)
+  dt=0.002,
+  ntc=2, ntf=2,
+  cut=10.0,
+  ig=-1,
+  ntb=2,
+  ntp=1,
+  barostat=2,
+  mcbarint=100,
+  pres0=1.01325,
+  ntt=3, gamma_ln=2.0, tempi=300.0, temp0=300.0,
+  ntpr=1000, ntwx=1000, ntwr=5000000,
+  ioutfm=1, ntxo=2,
+  iwrap=1,
+/

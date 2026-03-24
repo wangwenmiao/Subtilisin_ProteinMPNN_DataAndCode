@@ -1,0 +1,55 @@
+
+          -------------------------------------------------------
+          Amber 24 PMEMD                              2024
+          -------------------------------------------------------
+
+| PMEMD implementation of SANDER, Release 24
+
+|  Compiled date/time: Fri Apr  4 05:55:38 2025
+| Run on 02/06/2026 at 14:39:35
+
+|   Executable path: pmemd.cuda
+| Working directory: /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles
+|          Hostname: Unknown
+  [-O]verwriting output
+
+File Assignments:
+|   MDIN: /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles/step
+|  MDOUT: step8_prod_npt.out                                                    
+| INPCRD: step7.7_equil_npt_weak_constr.rst7                                    
+|   PARM: complex_solv.prmtop                                                   
+| RESTRT: step8_prod_npt.rst7                                                   
+|   REFC: refc                                                                  
+|  MDVEL: mdvel                                                                 
+|   MDEN: mden                                                                  
+|  MDCRD: step8_prod_npt.nc                                                     
+| MDINFO: mdinfo                                                                
+|  MDFRC: mdfrc                                                                 
+
+
+ Here is the input file:
+
+NPT production run (300K, 1atm), no restraints (Monte Carlo barostat)          
+&cntrl                                                                         
+  imin=0, irest=0, ntx=1,                                                      
+  nstlim=60000000,       ! 100 ns (50000000 * 0.002 ps/step)                   
+  dt=0.002,                                                                    
+  ntc=2, ntf=2,                                                                
+  cut=10.0,                                                                    
+  ig=-1,                                                                       
+  ntb=2,                                                                       
+  ntp=1,                                                                       
+  barostat=2,                                                                  
+  mcbarint=100,                                                                
+  pres0=1.01325,                                                               
+  ntt=3, gamma_ln=2.0, tempi=300.0, temp0=300.0,                               
+  ntpr=1000, ntwx=1000, ntwr=5000000,                                          
+  ioutfm=1, ntxo=2,                                                            
+  iwrap=1,                                                                     
+/                                                                              
+
+
+Note: ig = -1. Setting random seed to    76977 based on wallclock time in 
+      microseconds.
+| irandom = 1, using AMBER's internal random number generator (default).
+ 

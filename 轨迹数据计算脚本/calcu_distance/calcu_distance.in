@@ -1,0 +1,6 @@
+parm complex_solv.prmtop
+trajin step8_prod_nvt.nc 1 last 1
+distance d1 :43@OD1,OD2 :79@ND1 out triad_distances.dat
+distance d2 :79@NE2 :233@OG out triad_distances.dat
+angle a1 :233@OG :79@NE2 :79@ND1 out triad_angle.dat
+run

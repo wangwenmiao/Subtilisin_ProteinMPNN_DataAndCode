@@ -1,0 +1,14 @@
+Unrestrained minimization of the entire system
+&cntrl
+  imin=1,
+  maxcyc=10000,      ! Fewer cycles might be sufficient here
+  ncyc=500,
+  ntmin=2,
+  cut=10.0,
+  ntb=1,
+  ntc=1, ntf=1,
+  ntpr=100,
+  ntwr=500,
+  ! ntr=0,          ! No restraints (commenting out ntr, restraintmask, restraint_wt is equivalent)
+  ntxo=2,
+/

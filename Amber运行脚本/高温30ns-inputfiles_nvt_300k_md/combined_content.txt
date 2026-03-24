@@ -1,0 +1,323 @@
+--- 文件开始: md_pro_gpu0.sh ---
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES=0
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step8_prod_nvt.in -o step8_prod_nvt.out -p complex_solv.prmtop -c step5_equil_nvt_573K_4.rst7 -r step8_prod_nvt.rst7 -ref step5_equil_nvt_573K_4.rst7 -x step8_prod_nvt.nc
+
+--- 文件结束: md_pro_gpu0.sh ---
+
+--- 文件开始: step4_heat_nvt_373K.in ---
+NVT heating from 300K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=300.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=4.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  nmropt=1,                ! Activate NMR options for TEMP0 ramp
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+&wt TYPE='TEMP0', istep1=0, istep2=25000,   ! Ramp temperature over 30 ps
+  value1=300.0, value2=373.0 /                ! from 0.1 K to 300.0 K
+&wt TYPE='END' /
+
+--- 文件结束: step4_heat_nvt_373K.in ---
+
+--- 文件开始: step4_heat_nvt_300K.in ---
+NVT heating from 0.1K to 300K with protein backbone restraints
+&cntrl
+  imin=0, irest=0, ntx=1,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=0.1,               ! Initial temperature for velocity generation
+  temp0=300.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=5.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  nmropt=1,                ! Activate NMR options for TEMP0 ramp
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+&wt TYPE='TEMP0', istep1=0, istep2=25000, value1=0.1, value2=300.0/
+&wt TYPE='END' /
+
+--- 文件结束: step4_heat_nvt_300K.in ---
+
+--- 文件开始: step2_min_hydrogens.in ---
+Minimization of hydrogen atoms with all heavy atoms restrained
+&cntrl
+  imin=1,           ! Minimize
+  maxcyc=10000,      ! Max minimization cycles
+  ncyc=1000,        ! SD then CG
+  ntmin=2,
+  cut=10.0,
+  ntb=1,
+  ntc=1, ntf=1,
+  ntpr=100,
+  ntwr=1000,
+  ntr=1,
+  restraintmask='!@H=', ! Restrain ALL non-hydrogen atoms (protein and solvent)
+  restraint_wt=5.0,   ! Medium restraint
+  ntxo=2,
+/
+
+--- 文件结束: step2_min_hydrogens.in ---
+
+--- 文件开始: step5_equil_nvt_573K_4.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=0,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step5_equil_nvt_573K_4.in ---
+
+--- 文件开始: step3_min_unconstr.in ---
+Unrestrained minimization of the entire system
+&cntrl
+  imin=1,
+  maxcyc=10000,      ! Fewer cycles might be sufficient here
+  ncyc=500,
+  ntmin=2,
+  cut=10.0,
+  ntb=1,
+  ntc=1, ntf=1,
+  ntpr=100,
+  ntwr=500,
+  ! ntr=0,          ! No restraints (commenting out ntr, restraintmask, restraint_wt is equivalent)
+  ntxo=2,
+/
+
+--- 文件结束: step3_min_unconstr.in ---
+
+--- 文件开始: step1_min_solvent.in ---
+Minimization of solvent and ions with protein heavy atoms restrained
+&cntrl
+  imin=1,           ! Perform energy minimization
+  maxcyc=10000,      ! Maximum number of minimization cycles
+  ncyc=1000,        ! First 1000 cycles steepest descent, then conjugate gradient
+  ntmin=2,          ! Steepest descent then conjugate gradient
+  cut=10.0,         ! Cutoff for non-bonded interactions (Angstroms)
+  ntb=1,            ! Constant volume periodic boundary
+  ntc=1,            ! No SHAKE for bonds
+  ntf=1,            ! No SHAKE, calculate all forces
+  ntpr=100,         ! Print energy information every 100 steps
+  ntwr=1000,        ! Write restart file every 1000 steps (or at end)
+  ntr=1,            ! Use positional restraints
+  restraintmask=':1-1000 & !@H=', ! Restrain all heavy atoms of the protein
+  restraint_wt=10.0,  ! Restraint force constant (kcal/mol/A^2) - Strong restraint
+  ntxo=2,           ! Write restart file in NetCDF format
+/
+
+--- 文件结束: step1_min_solvent.in ---
+
+--- 文件开始: md_min_heat_equil_gpu0.sh ---
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES=0
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step1_min_solvent.in -o step1_min_solvent.out -p complex_solv.prmtop -c complex_solv.inpcrd -r step1_min_solvent.rst7 -ref complex_solv.inpcrd -x step1_min_solvent.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step2_min_hydrogens.in -o step2_min_hydrogens.out -p complex_solv.prmtop -c step1_min_solvent.rst7 -r step2_min_hydrogens.rst7 -ref step1_min_solvent.rst7 -x step2_min_hydrogens.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step3_min_unconstr.in -o step3_min_unconstr.out -p complex_solv.prmtop -c step2_min_hydrogens.rst7 -r step3_min_unconstr.rst7 -x step3_min_unconstr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step4_heat_nvt_300K.in -o step4_heat_nvt_300K.out -p complex_solv.prmtop -c step3_min_unconstr.rst7 -r step4_heat_nvt.rst7 -ref step3_min_unconstr.rst7 -x step4_heat_nvt.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step4_heat_nvt_373K.in -o step4_heat_nvt_373K.out -p complex_solv.prmtop -c step4_heat_nvt.rst7 -r step4_heat_nvt_373K.rst7 -ref step4_heat_nvt.rst7 -x step4_heat_nvt_373K.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step4_heat_nvt_473K.in -o step4_heat_nvt_473K.out -p complex_solv.prmtop -c step4_heat_nvt_373K.rst7 -r step4_heat_nvt_473K.rst7 -ref step4_heat_nvt_373K.rst7 -x step4_heat_nvt_473K.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step4_heat_nvt_573K.in -o step4_heat_nvt_573K.out -p complex_solv.prmtop -c step4_heat_nvt_473K.rst7 -r step4_heat_nvt_573K.rst7 -ref step4_heat_nvt_473K.rst7 -x step4_heat_nvt_573K.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step5_equil_nvt_573K_1.in -o step5_equil_nvt_573K_1.out -p complex_solv.prmtop -c step4_heat_nvt_573K.rst7 -r step5_equil_nvt_573K_1.rst7 -ref step4_heat_nvt_573K.rst7 -x step5_equil_nvt_573K_1.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step5_equil_nvt_573K_2.in -o step5_equil_nvt_573K_2.out -p complex_solv.prmtop -c step5_equil_nvt_573K_1.rst7 -r step5_equil_nvt_573K_2.rst7 -ref step5_equil_nvt_573K_1.rst7 -x step5_equil_nvt_573K_2.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step5_equil_nvt_573K_3.in -o step5_equil_nvt_573K_3.out -p complex_solv.prmtop -c step5_equil_nvt_573K_2.rst7 -r step5_equil_nvt_573K_3.rst7 -ref step5_equil_nvt_573K_2.rst7 -x step5_equil_nvt_573K_3.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns_ace_aapfa_nme_HID/inputfiles_nvt_573k_md/step5_equil_nvt_573K_4.in -o step5_equil_nvt_573K_4.out -p complex_solv.prmtop -c step5_equil_nvt_573K_3.rst7 -r step5_equil_nvt_573K_4.rst7 -ref step5_equil_nvt_573K_3.rst7 -x step5_equil_nvt_573K_4.nc
+
+--- 文件结束: md_min_heat_equil_gpu0.sh ---
+
+--- 文件开始: step4_heat_nvt_473K.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=3.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step4_heat_nvt_473K.in ---
+
+--- 文件开始: step5_equil_nvt_573K_3.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=0.2,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step5_equil_nvt_573K_3.in ---
+
+--- 文件开始: step5_equil_nvt_573K_1.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=1.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step5_equil_nvt_573K_1.in ---
+
+--- 文件开始: step4_heat_nvt_573K.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=2.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step4_heat_nvt_573K.in ---
+
+--- 文件开始: step5_equil_nvt_573K_2.in ---
+NVT heating from 373K to 373K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=373.0,               ! Initial temperature for velocity generation
+  temp0=373.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=0.5,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+
+
+--- 文件结束: step5_equil_nvt_573K_2.in ---
+
+--- 文件开始: step8_prod_nvt.in ---
+NVT production run (373K), no restraints
+&cntrl
+  imin=0, irest=0, ntx=1,
+  nstlim=60000000,       ! 100 ns (50000000 * 0.002 ps/step)
+  dt=0.002,
+  ntc=2, ntf=2,
+  cut=10.0,
+  ig=-1,
+  ntb=1,
+  ntt=3, gamma_ln=2.0, tempi=373.0, temp0=373.0,
+  ntpr=1000, ntwx=1000, ntwr=5000000,
+  ioutfm=1, ntxo=2,
+  iwrap=1,
+/
+
+--- 文件结束: step8_prod_nvt.in ---
+

@@ -1,0 +1,23 @@
+NVT heating from 473K to 473K with protein backbone restraints
+&cntrl
+  imin=0, irest=1, ntx=5,  ! MD from scratch, no velocities in input coords
+  nstlim=30000,            ! 60 ps (30000 * 0.002 ps/step)
+  dt=0.001,                ! 1.0 fs time step
+  ntc=2, ntf=2,            ! SHAKE on for bonds involving hydrogen
+  cut=10.0,
+  ntb=1,                   ! Constant volume periodic boundary (NVT)
+  ntpr=500,                ! Print energy info every 1.0 ps
+  ntwx=500,                ! Write coordinates every 1.0 ps to trajectory
+  ntwr=5000,               ! Write restart file every 10 ps
+  ntt=3,                   ! Langevin thermostat
+  gamma_ln=2.0,            ! Collision frequency (ps^-1)
+  tempi=473.0,               ! Initial temperature for velocity generation
+  temp0=473.0,             ! Target temperature (will be ramped)
+  ig=1,                   ! Random seed for velocity generation
+  ntr=1,                   ! Positional restraints on
+  restraintmask=':1-1000 & @C,CA,N', ! Restrain protein backbone atoms (C, CA, N)
+  restraint_wt=1.0,        ! Medium restraint force constant (kcal/mol/A^2)
+  ioutfm=1,                ! Write trajectory in NetCDF format
+  ntxo=2,                  ! Write restart file in NetCDF format
+/
+

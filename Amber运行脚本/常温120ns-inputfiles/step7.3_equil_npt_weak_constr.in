@@ -1,0 +1,18 @@
+NPT equilibration (300K, 1atm) with weak protein backbone restraints (Monte Carlo barostat)
+&cntrl
+  imin=0, irest=1, ntx=5,
+  nstlim=1000000,              ! 2000 ps (1000000 * 0.002 ps/step) - or longer if needed
+  dt=0.002,                   ! Consider switching to dt=0.002 if stable
+  ntc=2, ntf=2,
+  cut=10.0,
+  ntb=2, ntp=1, barostat=2, pres0=1.01325, mcbarint=100,
+  ntpr=5000,                  ! Print/write every 1 ps
+  ntwx=5000,
+  ntwr=10000,                 ! Write restart every 10 ps
+  ntt=3, gamma_ln=2.0,
+  temp0=300.0,
+  ntr=1,
+  restraintmask=':1-1000 & @C,CA,N',
+  restraint_wt=0.5,           ! Weak restraint_wt
+  ioutfm=1, ntxo=2,
+/

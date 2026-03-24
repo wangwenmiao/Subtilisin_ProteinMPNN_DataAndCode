@@ -1,0 +1,12 @@
+#!/bin/bash
+export PATH=/usr/local/cuda-12.8/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64:$LD_LIBRARY_PATH
+export CUDA_HOME=/usr/local/cuda-12.8
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+export CUDA_VISIBLE_DEVICES=0
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step6_equil_npt_medium_constr.in -o step6_equil_npt_medium_constr.out -p complex_solv.prmtop -c step5_equil_npt_strong_constr.rst7 -r step6_equil_npt_medium_constr.rst7 -ref step5_equil_npt_strong_constr.rst7 -x step6_equil_npt_medium_constr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step7_equil_npt_weak_constr.in -o step7_equil_npt_weak_constr.out -p complex_solv.prmtop -c step6_equil_npt_medium_constr.rst7 -r step7_equil_npt_weak_constr.rst7 -ref step6_equil_npt_medium_constr.rst7 -x step7_equil_npt_weak_constr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step7.3_equil_npt_weak_constr.in -o step7.3_equil_npt_weak_constr.out -p complex_solv.prmtop -c step7_equil_npt_weak_constr.rst7 -r step7.3_equil_npt_weak_constr.rst7 -ref step7_equil_npt_weak_constr.rst7 -x step7.3_equil_npt_weak_constr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step7.5_equil_npt_weak_constr.in -o step7.5_equil_npt_weak_constr.out -p complex_solv.prmtop -c step7.3_equil_npt_weak_constr.rst7 -r step7.5_equil_npt_weak_constr.rst7 -ref step7.3_equil_npt_weak_constr.rst7 -x step7.5_equil_npt_weak_constr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step7.7_equil_npt_weak_constr.in -o step7.7_equil_npt_weak_constr.out -p complex_solv.prmtop -c step7.5_equil_npt_weak_constr.rst7 -r step7.7_equil_npt_weak_constr.rst7 -ref step7.5_equil_npt_weak_constr.rst7 -x step7.7_equil_npt_weak_constr.nc
+pmemd.cuda -O -i /home/yons/wwm/4519_subtilisin_120ns/inputfiles/step8_prod_npt.in -o step8_prod_npt.out -p complex_solv.prmtop -c step7.7_equil_npt_weak_constr.rst7 -r step8_prod_npt.rst7 -x step8_prod_npt.nc

@@ -1,0 +1,23 @@
+NPT equilibration (300K, 1atm) with medium protein backbone restraints (Monte Carlo barostat)
+&cntrl
+  imin=0, irest=1, ntx=5,     ! Continue MD, read coords, vels, box from prev. restart
+  nstlim=1000000,              ! 2000 ps (1000000 * 0.002 ps/step)
+  dt=0.002,
+  ntc=2, ntf=2,
+  cut=10.0,
+  ntb=2,                      ! Constant pressure periodic boundary (NPT)
+  ntp=1,
+  barostat=2,
+  pres0=1.01325,              ! Target pressure in bar (1 atm)
+  mcbarint=100,               ! MC barostat update interval (steps)
+  ntpr=500,
+  ntwx=500,
+  ntwr=5000,
+  ntt=3, gamma_ln=2.0,
+  temp0=300.0,
+  ntr=1,
+  ntpr=5000, ntwx=5000, ntwr=10000,
+  restraintmask=':1-1000 & @C,CA,N',
+  restraint_wt=2.0,           ! Medium restraint_wt
+  ioutfm=1, ntxo=2,
+/

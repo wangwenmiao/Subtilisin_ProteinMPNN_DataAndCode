@@ -1,0 +1,16 @@
+Minimization of hydrogen atoms with all heavy atoms restrained
+&cntrl
+  imin=1,           ! Minimize
+  maxcyc=10000,      ! Max minimization cycles
+  ncyc=1000,        ! SD then CG
+  ntmin=2,
+  cut=10.0,
+  ntb=1,
+  ntc=1, ntf=1,
+  ntpr=100,
+  ntwr=1000,
+  ntr=1,
+  restraintmask='!@H=', ! Restrain ALL non-hydrogen atoms (protein and solvent)
+  restraint_wt=5.0,   ! Medium restraint
+  ntxo=2,
+/

@@ -1,0 +1,17 @@
+Minimization of solvent and ions with protein heavy atoms restrained
+&cntrl
+  imin=1,           ! Perform energy minimization
+  maxcyc=10000,      ! Maximum number of minimization cycles
+  ncyc=1000,        ! First 1000 cycles steepest descent, then conjugate gradient
+  ntmin=2,          ! Steepest descent then conjugate gradient
+  cut=10.0,         ! Cutoff for non-bonded interactions (Angstroms)
+  ntb=1,            ! Constant volume periodic boundary
+  ntc=1,            ! No SHAKE for bonds
+  ntf=1,            ! No SHAKE, calculate all forces
+  ntpr=100,         ! Print energy information every 100 steps
+  ntwr=1000,        ! Write restart file every 1000 steps (or at end)
+  ntr=1,            ! Use positional restraints
+  restraintmask=':1-1000 & !@H=', ! Restrain all heavy atoms of the protein
+  restraint_wt=10.0,  ! Restraint force constant (kcal/mol/A^2) - Strong restraint
+  ntxo=2,           ! Write restart file in NetCDF format
+/
