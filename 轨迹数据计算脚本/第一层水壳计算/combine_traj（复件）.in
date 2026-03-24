@@ -1,0 +1,19 @@
+parm complex_solv.prmtop
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md10/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md5/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md2/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md6/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md3/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md4/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md7/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md9/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md1/step8_prod_npt.nc 501 60000 1
+trajin /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID_new/1648_ca_2_apo/md8/step8_prod_npt.nc 501 60000 1
+autoimage
+rms first :1-290@CA
+average crdset AVG
+run
+rms ref AVG :1-290@CA
+trajout combine.nc
+run
+quit

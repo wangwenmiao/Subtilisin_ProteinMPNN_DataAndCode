@@ -1,0 +1,289 @@
+python3 /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID/gmx_calcu_sasa/input-files/acpype.py -p complex_solv.prmtop -x complex_solv.inpcrd
+
+python3 - <<'PY'
+import parmed as pmd
+print("Loading AMBER topology and coordinate files...")
+s = pmd.load_file('complex_solv.prmtop', 'complex_solv.inpcrd')
+print("Saving as GROMACS topology file...")
+s.save('complex.top', overwrite=True)
+print("Topology file generated: complex.top")
+PY
+
+python3 /home/yons/wwm_temp/gmx_calcu_sasa/input-files/convert2gmx.py
+
+cpptraj.cuda -p complex_solv.prmtop -y combine.nc -x complex.trr
+
+gmx trjconv -f complex.trr -s complex_solv_GMX.gro -o complex.xtc
+
+cpptraj -p complex_solv.prmtop -y combine.nc -x temp_traj.xtc
+
+cpptraj <<'EOF'
+parm complex_solv.prmtop
+trajin combine.nc 1 1 1
+trajout first_frame.pdb pdb
+go
+EOF
+
+gmx editconf -f first_frame.pdb -o first_frame.gro
+
+gmx grompp -f md.mdp -c first_frame.gro -p complex.top -o complex.tpr -maxwarn 1
+
+#gmx grompp -f md.mdp -c complex_solv_GMX.gro -p complex_solv_GMX.top -o complex_1.tpr -maxwarn 1
+
+gmx make_ndx -f complex.tpr -o index.ndx <<EOF
+16 & a O
+name 20 Water_O
+q
+EOF
+
+gmx rdf -s complex.tpr -f temp_traj.xtc -n index.ndx -ref 'group "Protein-H"' -sel 'group "Water_O"' -surf mol -bin 0.005 -rmax 1.2 -cn cn_Ow_Prot-H.xvg
+
+
+
+
+
+mpirun -n 24 cpptraj.MPI -i combine_traj.in
+python3 /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID/gmx_calcu_sasa/input-files/acpype.py -p complex_solv.prmtop -x complex_solv.inpcrd
+python3 /home/yons/wwm_temp/gmx_calcu_sasa/input-files/convert2gmx.py
+cpptraj -p complex_solv.prmtop -y combine.nc -x complex.xtc
+gmx grompp -f md.mdp -c complex_solv_GMX.gro -p complex_solv_GMX.top -o complex.tpr -maxwarn 1
+
+gmx make_ndx -f complex.tpr -o index.ndx <<EOF
+17 & a O
+name 21 Water_O
+q
+EOF
+
+
+
+gmx make_ndx -f complex.tpr -o index.ndx <<EOF
+17 & a O
+name 21 Water_O
+q
+EOF
+
+0 System              : 35210 atoms
+  1 Protein             :  4046 atoms
+  2 Protein-H           :  2069 atoms
+  3 C-alpha             :   290 atoms
+  4 Backbone            :   870 atoms
+  5 MainChain           :  1161 atoms
+  6 MainChain+Cb        :  1416 atoms
+  7 MainChain+H         :  1444 atoms
+  8 SideChain           :  2602 atoms
+  9 SideChain-H         :   908 atoms
+ 10 Prot-Masses         :  4046 atoms
+ 11 non-Protein         : 31164 atoms
+ 12 Ion                 :     2 atoms
+ 13 Other               :    40 atoms
+ 14 CA                  :     2 atoms
+ 15 Na+                 :    23 atoms
+ 16 Cl-                 :    17 atoms
+ 17 Water               : 31122 atoms
+ 18 SOL                 : 31122 atoms
+ 19 non-Water           :  4088 atoms
+ 20 Water_and_ions      : 31124 atom
+ 
+ 
+ 
+gmx spatial -s complex.tpr -f complex.xtc -n index.ndx -bin 0.05 -nab 128 -ign -1 -nodiv <<EOF
+20
+1
+EOF
+
+gmx rdf -s complex.tpr -f complex.xtc -n index.ndx -ref 'group "Protein-H"' -sel 'group "Water_O"' -surf mol -bin 0.005 -rmax 1.2 -cn cn_Ow_Prot-H.xvg
+
+
+
+
+
+
+
+cpptraj -p complex_solv.prmtop -y step8_prod_npt.nc -x complex.xtc
+gmx grompp -f md.mdp -c complex_solv_GMX.gro -p complex_solv_GMX.top -o complex.tpr -maxwarn 1
+
+gmx make_ndx -f complex.tpr -o index.ndx <<EOF
+17 & a O
+name 21 Water_O
+q
+EOF
+
+
+gmx select -f complex.xtc -s complex.tpr -n index.ndx \
+  -select 'group Water_O and within 0.24 of group Protein' \
+  -os first_shell_water.xvg
+
+
+# ============================================================================
+# Step 1: 使用cpptraj提取第一帧并转换为PDB格式
+# 功能：从AMBER轨迹文件中提取第一帧结构
+# 输入：complex_solv.prmtop (AMBER拓扑文件), combine.nc (AMBER轨迹文件)
+# 输出：first_frame.pdb (PDB格式的第一帧结构)
+# ============================================================================
+cpptraj <<'EOF'
+parm complex_solv.prmtop
+trajin combine.nc 1 1 1
+trajout first_frame.pdb pdb
+go
+EOF
+
+
+# ============================================================================
+# Step 2: 将PDB格式转换为GROMACS .gro格式
+# 功能：使用gmx editconf工具进行格式转换
+# 输入：first_frame.pdb
+# 输出：first_frame.gro (GROMACS坐标文件)
+# ============================================================================
+gmx editconf -f first_frame.pdb -o first_frame.gro
+
+
+# ============================================================================
+# Step 3: 将完整轨迹从AMBER .nc格式转换为GROMACS .xtc格式
+# 功能：转换整个MD轨迹文件格式
+# 输入：complex_solv.prmtop, combine.nc
+# 输出：temp_traj.xtc (临时轨迹文件)
+# ============================================================================
+cpptraj -p complex_solv.prmtop -y combine.nc -x temp_traj.xtc
+
+combine.nc --> temp_traj.xtc
+# ============================================================================
+# Step 4.1: 运行acpype.py脚本生成GROMACS参数文件md.mdp
+# 功能：从AMBER参数生成GROMACS MD参数文件
+# 输入：complex_solv.prmtop, complex_solv.inpcrd
+# 输出：md.mdp (GROMACS MD参数文件)
+# 注意：需要将/path/to/acpype.py替换为实际路径
+# ============================================================================
+python3 /media/yons/wwm_data/4519_subtilisin_120ns_ace_aapfa_nme_HID/gmx_calcu_sasa/input-files/acpype.py -p complex_solv.prmtop -x complex_solv.inpcrd
+
+
+# ============================================================================
+# Step 4.2: 使用parmed将AMBER拓扑转换为GROMACS拓扑格式
+# 功能：转换分子动力学拓扑文件格式
+# 输入：complex_solv.prmtop (AMBER拓扑), complex_solv.inpcrd (AMBER坐标)
+# 输出：complex.top (GROMACS拓扑文件)
+# 依赖：Python parmed模块 (pip install parmed)
+# ============================================================================
+python3 - <<'PY'
+import parmed as pmd
+print("Loading AMBER topology and coordinate files...")
+s = pmd.load_file('complex_solv.prmtop', 'complex_solv.inpcrd')
+print("Saving as GROMACS topology file...")
+s.save('complex.top', overwrite=True)
+print("Topology file generated: complex.top")
+PY
+
+
+# ============================================================================
+# Step 5: 生成GROMACS tpr文件（运行输入文件）
+# 功能：预处理MD模拟参数，生成二进制运行文件
+# 输入：md.mdp (MD参数), first_frame.gro (初始结构), complex.top (拓扑)
+# 输出：complex.tpr (GROMACS运行文件)
+# 参数：-maxwarn 1 允许最多1个警告
+# ============================================================================
+gmx grompp -f md.mdp -c first_frame.gro -p complex.top -o complex.tpr -maxwarn 1
+GROmacs Molecular Pre-Processor = grompp
+
+# ============================================================================
+# Step 6: 修复周期性边界条件(PBC)导致的分子跳跃
+# 功能：处理分子跨越周期性边界的问题，使轨迹连续
+# 输入：complex.tpr, temp_traj.xtc
+# 输出：traj_nojump.xtc (无跳跃的轨迹)
+# 参数：-pbc nojump 移除PBC跳跃
+# ============================================================================
+echo 0 | gmx trjconv -s complex.tpr -f temp_traj.xtc -o traj_nojump.xtc -pbc nojump
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc
+# ============================================================================
+# Step 7: 蛋白质居中并使用紧凑单位晶胞
+# 功能：将蛋白质移到盒子中心，优化周期性边界条件
+# 输入：complex.tpr, traj_nojump.xtc
+# 输出：traj_center.xtc (居中后的轨迹)
+# 参数说明：
+#   -pbc mol      : 分子周期性边界条件处理
+#   -center       : 将蛋白质移到盒子中心
+#   -ur compact   : 使用紧凑单位晶胞
+#   echo -e "1\n0" : 选择第1组(蛋白质)作为中心，第0组(系统)作为输出
+# ============================================================================
+echo -e "1\n0" | gmx trjconv -s complex.tpr -f traj_nojump.xtc -o traj_center.xtc -pbc mol -center -ur compact
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc
+# ============================================================================
+# Step 8: 拟合蛋白质骨架（旋转+平移）
+# 功能：通过最小二乘法拟合蛋白质，消除整体运动
+# 输入：complex.tpr, traj_center.xtc
+# 输出：complex.xtc (最终处理的轨迹)
+# 参数说明：
+#   -fit rot+trans : 进行旋转和平移拟合
+#   echo -e "4\n0" : 选择第4组(CA原子)进行拟合，第0组作为输出
+# ============================================================================
+echo -e "4\n0" | gmx trjconv -s complex.tpr -f traj_center.xtc -o complex.xtc -fit rot+trans
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc --> complex.xtc
+# ============================================================================
+# Step 9: 提取可视化参考结构（第一帧）
+# 功能：从处理后的轨迹中提取第一帧作为参考结构
+# 输入：complex.tpr, complex.xtc
+# 输出：vis_ref.pdb (可视化参考结构)
+# 参数：-dump 0 提取第0帧（第一帧）
+# ============================================================================
+echo 1 | gmx trjconv -s complex.tpr -f complex.xtc -dump 0 -o vis_ref.pdb
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc --> complex.xtc --> vis_ref.pdb
+# ============================================================================
+# Step 12: 创建GROMACS索引文件，标记水分子氧原子
+# 功能：为后续分析创建自定义原子组
+# 输入：complex.tpr
+# 输出：index.ndx (GROMACS索引文件，包含Water_O组)
+# 操作说明：
+#   15 & a O      : 选择第15组(水分子)中的氧原子(a O)
+#   name 18 Water_O : 将新组命名为Water_O
+#   q             : 退出make_ndx
+# ============================================================================
+gmx make_ndx -f complex.tpr -o index.ndx <<EOF
+16 & a O
+name 20 Water_O
+q
+EOF
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc --> complex.xtc --> vis_ref.pdb --> index.ndx
+# ============================================================================
+# Step 13: 计算水分子的空间分布密度
+# 功能：生成水分子在蛋白质周围的空间分布图
+# 输入：complex.tpr, complex.xtc, index.ndx
+# 输出：spatial.pdb (水分子空间分布密度图)
+# 参数说明：
+#   -bin 0.05     : 网格间距0.05 nm
+#   -nab 128      : 网格点数128×128×128
+#   -ign -1       : 忽略第-1组
+#   -nodiv        : 不进行体积归一化
+#   echo -e "18\n1" : 选择第18组(Water_O)和第1组(蛋白质)
+# ============================================================================
+echo -e "20\n1" | gmx spatial -s complex.tpr -f complex.xtc -n index.ndx -bin 0.05 -nab 128 -ign -1 -nodiv
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc --> complex.xtc --> vis_ref.pdb --> index.ndx --> index.ndx
+# ============================================================================
+# Step 14: 计算蛋白质与水分子之间的径向分布函数(RDF)
+# 功能：分析蛋白质周围水分子的分布特性
+# 输入：complex.tpr, traj_center.xtc, index.ndx
+# 输出：cn_Ow_Prot-H.xvg (RDF和配位数数据文件)
+# 参数说明：
+#   -ref 'group "Protein-H"'  : 参考组为蛋白质非氢原子
+#   -sel 'group "Water_O"'    : 选择组为水分子氧原子
+#   -surf mol                 : 计算表面RDF
+#   -bin 0.005                : 直方图间距0.005 nm
+#   -rmax 1.2                 : 最大距离1.2 nm
+#   -cn cn_Ow_Prot-H.xvg      : 输出配位数文件
+# ============================================================================
+gmx rdf -s complex.tpr -f traj_center.xtc -n index.ndx -ref 'group "Protein-H"' -sel 'group "Water_O"' -surf mol -bin 0.005 -rmax 1.2 -cn cn_Ow_Prot-H.xvg
+
+combine.nc --> temp_traj.xtc --> traj_nojump.xtc --> traj_center.xtc --> complex.xtc --> vis_ref.pdb --> index.ndx --> index.ndx --> cn_Ow_Prot-H.xvg
+# ============================================================================
+# Step 15: 清理临时文件
+# 功能：删除中间过程生成的临时文件，节省磁盘空间
+# 删除文件：
+#   first_frame.pdb   : 第一帧PDB文件
+#   temp_traj.xtc     : 临时轨迹文件
+#   traj_nojump.xtc   : 无跳跃轨迹文件
+#   traj_center.xtc   : 居中轨迹文件
+# ============================================================================
+rm -f first_frame.pdb temp_traj.xtc traj_nojump.xtc traj_center.xtc

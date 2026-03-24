@@ -1,0 +1,16 @@
+&general
+  startframe=1,
+  endframe=1000000,
+  interval=1,
+  verbose=2
+/
+&pb
+  istrng=0.100,
+  inp=2,
+  indi = 4.0,
+  exdi = 80.0
+/
+&decomp
+  idecomp=2,
+  dec_verbose=3,
+/

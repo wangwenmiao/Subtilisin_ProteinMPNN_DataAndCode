@@ -1,0 +1,5 @@
+parm complex_solv.prmtop
+loadRestrt complex_solv.inpcrd
+outparm complex_solv_GMX.top complex_solv_GMX.gro gromacs
+quit
+

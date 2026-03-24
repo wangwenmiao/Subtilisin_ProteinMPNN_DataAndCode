@@ -1,0 +1,6 @@
+parm complex_solv.prmtop
+trajin step8_prod_npt.nc 1 last 1
+autoimage
+reference step8_prod_npt.nc 1
+nativecontacts name NCIC :8-297&!@H= distance 4.0 reference out NCIC_4A.dat
+run
